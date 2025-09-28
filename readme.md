@@ -31,7 +31,7 @@ Inspirado em bibliotecas como GORM, mas focado em **clareza, modularidade e apre
 │    │    └── file_loader.go
 │    │
 │    └── /utils
-│         ├── reflect.go       # Utilidades com reflection (para mapear structs)
+│         ├── mapping.go       # Utilidades com reflection (para mapear structs)
 │         ├── sql_builder.go   # Construtor genérico de queries
 │         └── logger.go        # Logger interno
 │
