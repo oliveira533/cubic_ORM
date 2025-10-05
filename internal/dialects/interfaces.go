@@ -1,6 +1,6 @@
 package dialects
 
-type Dialects interface {
+type DialectInterface interface {
 	Name() string
 	Placeholder(idx int) string
 	InsertSuffix() string

@@ -8,7 +8,7 @@ import (
 	"github.com/oliveira533/cubic_ORM.git/internal/dialects"
 )
 
-func BuildInsertQuery(model any, dialect dialects.Dialects) (string, []any, error) {
+func BuildInsertQuery(model any, dialect dialects.DialectInterface) (string, []any, error) {
 	value := reflect.ValueOf(model)
 
 	if value.Kind() == reflect.Ptr {
