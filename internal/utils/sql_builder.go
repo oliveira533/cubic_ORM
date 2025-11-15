@@ -8,7 +8,7 @@ import (
 	"github.com/oliveira533/cubic_ORM.git/internal/dialects"
 )
 
-func BuildInsertQuery(model any, dialect dialects.DialectInterface) (string, []any, error) {
+func BuildInsertQuery(dialect dialects.DialectInterface, model any) (string, []any, error) {
 	value := reflect.ValueOf(model)
 
 	if value.Kind() == reflect.Ptr {
@@ -46,6 +46,8 @@ func BuildInsertQuery(model any, dialect dialects.DialectInterface) (string, []a
 	return query, args, nil
 
 }
+
+func BuildSelectQuery(dialect dialects.DialectInterface, model any) {}
 
 func hasMeta(meta []MetaField, title string) bool {
 	for _, m := range meta {

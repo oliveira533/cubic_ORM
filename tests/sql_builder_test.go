@@ -39,7 +39,7 @@ func TestSQLBuilderStruct(t *testing.T) {
 			Email: "joao@email.com",
 		}
 
-		sql, args, err := utils.BuildInsertQuery(user, MySQLDialect{})
+		sql, args, err := utils.BuildInsertQuery(MySQLDialect{}, user)
 
 		// Verifica se não houve erro
 		if err != nil {
@@ -100,7 +100,7 @@ func TestSQLBuilderStruct(t *testing.T) {
 			Email: "maria@email.com",
 		}
 
-		sql, args, err := utils.BuildInsertQuery(user, PostgreSQLDialect{})
+		sql, args, err := utils.BuildInsertQuery(PostgreSQLDialect{}, user)
 
 		// Verifica se não houve erro
 		if err != nil {
@@ -132,7 +132,7 @@ func TestSQLBuilderStruct(t *testing.T) {
 			Email: "pedro@email.com",
 		}
 
-		sql, args, err := utils.BuildInsertQuery(user, MySQLDialect{})
+		sql, args, err := utils.BuildInsertQuery(MySQLDialect{}, user)
 
 		if err != nil {
 			t.Errorf("Erro inesperado: %v", err)
@@ -156,7 +156,7 @@ func TestSQLBuilderStruct(t *testing.T) {
 			Email: "ana@email.com",
 		}
 
-		sql, args, err := utils.BuildInsertQuery(user, MySQLDialect{})
+		sql, args, err := utils.BuildInsertQuery(MySQLDialect{}, user)
 
 		if err != nil {
 			t.Errorf("Erro inesperado: %v", err)
@@ -193,6 +193,6 @@ func BenchmarkBuildInsertQuery(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		utils.BuildInsertQuery(user, MySQLDialect{})
+		utils.BuildInsertQuery(MySQLDialect{}, user)
 	}
 }

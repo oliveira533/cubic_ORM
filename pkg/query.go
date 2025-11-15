@@ -8,9 +8,9 @@ import (
 	"github.com/oliveira533/cubic_ORM.git/internal/utils"
 )
 
-func Insert(model any, conn *db.Connection) (sql.Result, error) {
+func Insert(conn *db.Connection, model any) (sql.Result, error) {
 
-	command, args, err := utils.BuildInsertQuery(model, conn.Dialect)
+	command, args, err := utils.BuildInsertQuery(conn.Dialect, model)
 
 	if err != nil {
 		return nil, fmt.Errorf("rant generate sql query: %e", err)
