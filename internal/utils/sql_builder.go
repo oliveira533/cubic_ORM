@@ -27,7 +27,6 @@ func BuildInsertQuery(model any, dialect dialects.DialectInterface) (string, []a
 		}
 
 		coluns = append(coluns, field.ColumnName)
-		//
 		placeholders = append(placeholders, dialect.Placeholder(len(coluns)))
 		// get the value we want insert and convert the generic type in interface to inser in db
 		args = append(args, value.Field(idx).Interface())
