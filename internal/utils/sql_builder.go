@@ -3,8 +3,10 @@ package utils
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 
+	"github.com/oliveira533/cubic_ORM.git/internal/db"
 	"github.com/oliveira533/cubic_ORM.git/internal/dialects"
 )
 
@@ -47,7 +49,58 @@ func BuildInsertQuery(dialect dialects.DialectInterface, model any) (string, []a
 
 }
 
-func BuildSelectQuery(dialect dialects.DialectInterface, model any) {}
+func BuildSelectQuery(dialect dialects.DialectInterface, query db.Select) (string, []any, error) {
+	fields, table := MappingStruct(query.Model)
+
+	cols := query.Fields
+
+	if len(cols) == 0 {
+		for _, field := range fields {
+			cols = append(cols, field.ColumnName)
+		}
+	}
+
+	from := query.Table
+
+	if from == "" {
+		from = table
+	}
+
+	builder := strings.Builder{}
+
+	builder.WriteString("SELEC ")
+	builder.WriteString(strings.Join(cols, ", "))
+	builder.WriteString(" FROM ")
+	builder.WriteString(from)
+
+	var args []any
+	if len(query.Where) > 0 {
+		builder.WriteString(" WHERE ")
+		clauses := make([]string, len(query.Where))
+
+		for idx, clause := range query.Where {
+			placeholder := dialect.Placeholder(idx + 1)
+			clauses[idx] = fmt.Sprintf("%s %s", clause, placeholder)
+
+			if idx < len(query.Args) {
+				args = append(args, query.Args[idx])
+			}
+		}
+		builder.WriteString(strings.Join(clauses, " AND "))
+	}
+
+	if query.OrderBy != "" {
+		builder.WriteString(" ORDER BY ")
+		builder.WriteString(query.OrderBy)
+	}
+
+	if query.Limit > 0 {
+		builder.WriteString(" LIMIT ")
+		builder.WriteString(strconv.Itoa(query.Limit))
+	}
+
+	return builder.String(), args, nil
+}
 
 func hasMeta(meta []MetaField, title string) bool {
 	for _, m := range meta {

@@ -24,3 +24,6 @@ func Insert(conn *db.Connection, model any) (sql.Result, error) {
 
 	return results, nil
 }
+
+func Select(conn *db.Connection, query db.Select) {
+}

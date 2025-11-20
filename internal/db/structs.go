@@ -10,3 +10,13 @@ type Connection struct {
 	DB      *sql.DB
 	Dialect dialects.DialectInterface
 }
+
+type Select struct {
+	Table   string
+	Model   any
+	Where   []string
+	Args    []string
+	OrderBy string
+	Limit   int
+	Fields  []string
+}
