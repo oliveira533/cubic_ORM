@@ -34,12 +34,16 @@ func BuildInsertQuery(dialect dialects.DialectInterface, model any) (string, []a
 		args = append(args, value.Field(idx).Interface())
 	}
 
-	query := fmt.Sprintf(
-		"INSERT INTO %s (%s) VALUES (%s)",
-		table,
-		strings.Join(coluns, ", "),
-		strings.Join(placeholders, ", "),
-	)
+	var builder strings.Builder
+	builder.WriteString("INSERT INTO ")
+	builder.WriteString(table)
+	builder.WriteString(" (")
+	builder.WriteString(strings.Join(coluns, ", "))
+	builder.WriteString(") VALUES (")
+	builder.WriteString(strings.Join(placeholders, ", "))
+	builder.WriteString(")")
+
+	query := builder.String()
 
 	if suffix := dialect.InsertSuffix(); suffix != "" {
 		query += " " + suffix
