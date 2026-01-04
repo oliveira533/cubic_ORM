@@ -8,15 +8,27 @@ import (
 	"github.com/oliveira533/cubic_ORM.git/internal/utils"
 )
 
-func Insert(conn *db.Connection, model any) (sql.Result, error) {
+type Cubic struct {
+	connection *db.Connection
+	builder    *utils.SQL_Builder
+}
 
-	command, args, err := utils.BuildInsertQuery(conn.Dialect, model)
+func NewCubic(connection *db.Connection) *Cubic {
+	return &Cubic{
+		connection: connection,
+		builder:    utils.NewSQL_Builder(connection.Dialect),
+	}
+}
+
+func (cubic *Cubic) Insert(model any) (sql.Result, error) {
+
+	command, args, err := cubic.builder.Insert(model)
 
 	if err != nil {
-		return nil, fmt.Errorf("rant generate sql query: %e", err)
+		return nil, fmt.Errorf("cant generate sql query: %e", err)
 	}
 
-	results, err := conn.DB.Exec(command, args...)
+	results, err := cubic.connection.DB.Exec(command, args...)
 
 	if err != nil {
 		return nil, fmt.Errorf("error while executing the insert query \nerror: %e", err)
@@ -25,5 +37,34 @@ func Insert(conn *db.Connection, model any) (sql.Result, error) {
 	return results, nil
 }
 
-func Select(conn *db.Connection, query db.Select) {
+func (cubic *Cubic) Select(query db.Select) (sql.Result, error) {
+	command, args, err := cubic.builder.Select(query)
+
+	if err != nil {
+		return nil, fmt.Errorf("cant generate sql query: %e", err)
+	}
+
+	results, err := cubic.connection.DB.Exec(command, args...)
+
+	if err != nil {
+		return nil, fmt.Errorf("error while executing the insert query \nerror: %e", err)
+	}
+
+	return results, nil
+}
+
+func (cubic *Cubic) Update(query db.Update) (sql.Result, error) {
+	command, args, err := cubic.builder.Update(query)
+
+	if err != nil {
+		return nil, fmt.Errorf("cant generate sql query: %e", err)
+	}
+
+	results, err := cubic.connection.DB.Exec(command, args...)
+
+	if err != nil {
+		return nil, fmt.Errorf("error while executing the insert query \nerror: %e", err)
+	}
+
+	return results, nil
 }
