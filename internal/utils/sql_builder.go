@@ -10,7 +10,17 @@ import (
 	"github.com/oliveira533/cubic_ORM.git/internal/dialects"
 )
 
-func BuildInsertQuery(dialect dialects.DialectInterface, model any) (string, []any, error) {
+type SQL_Builder struct {
+	dialect dialects.DialectInterface
+}
+
+func NewSQL_Builder(dialect dialects.DialectInterface) *SQL_Builder {
+	return &SQL_Builder{
+		dialect: dialect,
+	}
+}
+
+func (sql_builder *SQL_Builder) Insert(model any) (string, []any, error) {
 	value := reflect.ValueOf(model)
 
 	if value.Kind() == reflect.Ptr {
@@ -24,12 +34,12 @@ func BuildInsertQuery(dialect dialects.DialectInterface, model any) (string, []a
 	var args []any
 
 	for idx, field := range fields {
-		if hasMeta(field.MataFields, "auto_increment") {
+		if sql_builder.hasMeta(field.MataFields, "auto_increment") {
 			continue
 		}
 
 		coluns = append(coluns, field.ColumnName)
-		placeholders = append(placeholders, dialect.Placeholder(len(coluns)))
+		placeholders = append(placeholders, sql_builder.dialect.Placeholder(len(coluns)))
 		// get the value we want insert and convert the generic type in interface to inser in db
 		args = append(args, value.Field(idx).Interface())
 	}
@@ -45,7 +55,7 @@ func BuildInsertQuery(dialect dialects.DialectInterface, model any) (string, []a
 
 	query := builder.String()
 
-	if suffix := dialect.InsertSuffix(); suffix != "" {
+	if suffix := sql_builder.dialect.InsertSuffix(); suffix != "" {
 		query += " " + suffix
 	}
 
@@ -53,7 +63,7 @@ func BuildInsertQuery(dialect dialects.DialectInterface, model any) (string, []a
 
 }
 
-func BuildSelectQuery(dialect dialects.DialectInterface, query db.Select) (string, []any, error) {
+func (sql_builder *SQL_Builder) Select(query db.Select) (string, []any, error) {
 	fields, table := MappingStruct(query.Model)
 
 	cols := query.Fields
@@ -72,7 +82,7 @@ func BuildSelectQuery(dialect dialects.DialectInterface, query db.Select) (strin
 
 	builder := strings.Builder{}
 
-	builder.WriteString("SELEC ")
+	builder.WriteString("SELECT ")
 	builder.WriteString(strings.Join(cols, ", "))
 	builder.WriteString(" FROM ")
 	builder.WriteString(from)
@@ -83,7 +93,7 @@ func BuildSelectQuery(dialect dialects.DialectInterface, query db.Select) (strin
 		clauses := make([]string, len(query.Where))
 
 		for idx, clause := range query.Where {
-			placeholder := dialect.Placeholder(idx + 1)
+			placeholder := sql_builder.dialect.Placeholder(idx + 1)
 			clauses[idx] = fmt.Sprintf("%s %s", clause, placeholder)
 
 			if idx < len(query.Args) {
@@ -106,7 +116,48 @@ func BuildSelectQuery(dialect dialects.DialectInterface, query db.Select) (strin
 	return builder.String(), args, nil
 }
 
-func hasMeta(meta []MetaField, title string) bool {
+func (sql_builder *SQL_Builder) Update(query db.Update) (string, []any, error) {
+	fields, table := MappingStruct(query.Model)
+
+	cols := query.Fields
+
+	if len(cols) == 0 {
+		for _, field := range fields {
+			cols = append(cols, field.ColumnName)
+		}
+	}
+
+	from := query.Table
+
+	if from == "" {
+		from = table
+	}
+
+	builder := strings.Builder{}
+
+	builder.WriteString("UPDATE ")
+	builder.WriteString(query.Table)
+
+	var args []any
+	if len(query.Where) > 0 {
+		clauses := make([]string, len(query.Where))
+		builder.WriteString(" WHERE ")
+		for idx, clause := range query.Where {
+			placeholder := sql_builder.dialect.Placeholder(idx + 1)
+			clauses[idx] = fmt.Sprintf("%s %s", clause, placeholder)
+
+			if idx < len(query.Args) {
+				args = append(args, query.Args[idx])
+			}
+		}
+		builder.WriteString(strings.Join(clauses, " AND "))
+
+	}
+
+	return builder.String(), args, nil
+}
+
+func (sql_builder *SQL_Builder) hasMeta(meta []db.MetaField, title string) bool {
 	for _, m := range meta {
 		if m.Title == title {
 			return true
