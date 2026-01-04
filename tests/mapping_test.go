@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 
+	"github.com/oliveira533/cubic_ORM.git/internal/db"
 	"github.com/oliveira533/cubic_ORM.git/internal/utils"
 	models_test "github.com/oliveira533/cubic_ORM.git/tests/models"
 )
@@ -65,7 +66,7 @@ func TestMappingStruct(t *testing.T) {
 
 func TestFieldInfo(t *testing.T) {
 	t.Run("Deve criar FieldInfo corretamente", func(t *testing.T) {
-		field := utils.FieldInfo{
+		field := db.FieldInfo{
 			Name:       "TestField",
 			ColumnName: "test_field",
 			Type:       "string",
