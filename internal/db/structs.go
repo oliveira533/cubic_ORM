@@ -20,3 +20,23 @@ type Select struct {
 	Limit   int
 	Fields  []string
 }
+
+type Update struct {
+	Table  string
+	Model  any
+	Fields []string
+	Args   []string
+	Where  []string
+}
+
+type FieldInfo struct {
+	Name       string
+	ColumnName string
+	MataFields []MetaField
+	Type       string
+}
+
+type MetaField struct {
+	Title string
+	Value *any
+}
