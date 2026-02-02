@@ -27,7 +27,7 @@ type Delete struct {
 	Fields   []string
 	Args     []string
 	Where    []string
-	Operator string
+	Operator *string
 }
 
 type Update struct {
@@ -36,7 +36,7 @@ type Update struct {
 	Fields   []string
 	Args     []string
 	Where    []string
-	Operator string
+	Operator *string
 }
 
 type FieldInfo struct {
