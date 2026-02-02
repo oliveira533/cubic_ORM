@@ -21,6 +21,14 @@ type Select struct {
 	Fields  []string
 }
 
+type Delete struct {
+	Table  string
+	Model  any
+	Fields []string
+	Args   []string
+	Where  []string
+}
+
 type Update struct {
 	Table  string
 	Model  any

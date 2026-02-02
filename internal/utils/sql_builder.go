@@ -157,6 +157,51 @@ func (sql_builder *SQL_Builder) Update(query db.Update) (string, []any, error) {
 	return builder.String(), args, nil
 }
 
+func (sql_builder *SQL_Builder) SafeDelete(query db.Delete) (string, []any, error) {
+	if len(query.Where) == 0 {
+		return "", nil, fmt.Errorf("can not delete without where")
+	}
+
+	fields, table := MappingStruct(query.Model)
+
+	cols := query.Fields
+
+	if len(cols) == 0 {
+		for _, field := range fields {
+			cols = append(cols, field.ColumnName)
+		}
+	}
+
+	from := query.Table
+
+	if from == "" {
+		from = table
+	}
+
+	builder := strings.Builder{}
+
+	builder.WriteString("DELETE ")
+	builder.WriteString(query.Table)
+
+	var args []any
+	if len(query.Where) > 0 {
+		clauses := make([]string, len(query.Where))
+		builder.WriteString(" WHERE ")
+		for idx, clause := range query.Where {
+			placeholder := sql_builder.dialect.Placeholder(idx + 1)
+			clauses[idx] = fmt.Sprintf("%s %s", clause, placeholder)
+
+			if idx < len(query.Args) {
+				args = append(args, query.Args[idx])
+			}
+		}
+		builder.WriteString(strings.Join(clauses, " AND "))
+
+	}
+
+	return builder.String(), args, nil
+}
+
 func (sql_builder *SQL_Builder) hasMeta(meta []db.MetaField, title string) bool {
 	for _, m := range meta {
 		if m.Title == title {
