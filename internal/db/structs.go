@@ -22,19 +22,21 @@ type Select struct {
 }
 
 type Delete struct {
-	Table  string
-	Model  any
-	Fields []string
-	Args   []string
-	Where  []string
+	Table    string
+	Model    any
+	Fields   []string
+	Args     []string
+	Where    []string
+	Operator string
 }
 
 type Update struct {
-	Table  string
-	Model  any
-	Fields []string
-	Args   []string
-	Where  []string
+	Table    string
+	Model    any
+	Fields   []string
+	Args     []string
+	Where    []string
+	Operator string
 }
 
 type FieldInfo struct {

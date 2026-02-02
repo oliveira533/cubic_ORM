@@ -150,8 +150,7 @@ func (sql_builder *SQL_Builder) Update(query db.Update) (string, []any, error) {
 				args = append(args, query.Args[idx])
 			}
 		}
-		builder.WriteString(strings.Join(clauses, " AND "))
-
+		builder.WriteString(strings.Join(clauses, fmt.Sprintf(" %s ", query.Operator)))
 	}
 
 	return builder.String(), args, nil
@@ -195,7 +194,7 @@ func (sql_builder *SQL_Builder) SafeDelete(query db.Delete) (string, []any, erro
 				args = append(args, query.Args[idx])
 			}
 		}
-		builder.WriteString(strings.Join(clauses, " AND "))
+		builder.WriteString(strings.Join(clauses, fmt.Sprintf(" %s ", query.Operator)))
 
 	}
 
