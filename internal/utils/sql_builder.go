@@ -160,7 +160,7 @@ func (sql_builder *SQL_Builder) Update(query db.Update) (string, []any, error) {
 	return builder.String(), args, nil
 }
 
-func (sql_builder *SQL_Builder) SafeDelete(query db.Delete) (string, []any, error) {
+func (sql_builder *SQL_Builder) SafeDelete(query db.SafeDelete) (string, []any, error) {
 	if len(query.Where) == 0 {
 		return "", nil, fmt.Errorf("can not delete without where")
 	}
@@ -183,8 +183,8 @@ func (sql_builder *SQL_Builder) SafeDelete(query db.Delete) (string, []any, erro
 
 	builder := strings.Builder{}
 
-	builder.WriteString("DELETE ")
-	builder.WriteString(query.Table)
+	builder.WriteString("DELETE FROM ")
+	builder.WriteString(from)
 
 	var args []any
 	if len(query.Where) > 0 {
@@ -204,6 +204,44 @@ func (sql_builder *SQL_Builder) SafeDelete(query db.Delete) (string, []any, erro
 		}
 		builder.WriteString(strings.Join(clauses, fmt.Sprintf(" %s ", op)))
 
+	}
+
+	return builder.String(), args, nil
+}
+
+func (sql_builder *SQL_Builder) HardDelete(query db.HardDelete) (string, []any, error) {
+	from := query.Table
+
+	if from == "" && query.Model != nil {
+		_, table := MappingStruct(query.Model)
+		from = table
+	}
+
+	if from == "" {
+		return "", nil, fmt.Errorf("table name or model is required")
+	}
+
+	builder := strings.Builder{}
+	builder.WriteString("DELETE FROM ")
+	builder.WriteString(from)
+
+	var args []any
+	if len(query.Where) > 0 {
+		clauses := make([]string, len(query.Where))
+		builder.WriteString(" WHERE ")
+		for idx, clause := range query.Where {
+			placeholder := sql_builder.dialect.Placeholder(idx + 1)
+			clauses[idx] = fmt.Sprintf("%s %s", clause, placeholder)
+
+			if idx < len(query.Args) {
+				args = append(args, query.Args[idx])
+			}
+		}
+		op := "AND"
+		if query.Operator != nil {
+			op = *query.Operator
+		}
+		builder.WriteString(strings.Join(clauses, fmt.Sprintf(" %s ", op)))
 	}
 
 	return builder.String(), args, nil

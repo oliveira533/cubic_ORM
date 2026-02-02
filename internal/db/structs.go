@@ -21,12 +21,20 @@ type Select struct {
 	Fields  []string
 }
 
-type Delete struct {
+type SafeDelete struct {
 	Table    string
 	Model    any
 	Fields   []string
 	Args     []string
 	Where    []string
+	Operator *string
+}
+
+type HardDelete struct {
+	Table    string
+	Model    any
+	Where    []string
+	Args     []string
 	Operator *string
 }
 

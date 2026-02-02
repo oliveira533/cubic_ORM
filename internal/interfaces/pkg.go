@@ -10,4 +10,6 @@ type Cubic interface {
 	Insert(model any) (sql.Result, error)
 	Select(query db.Select) (sql.Result, error)
 	Update(query db.Update) (sql.Result, error)
+	SafeDelete(query db.SafeDelete) (sql.Result, error)
+	HardDelete(query db.HardDelete) (sql.Result, error)
 }

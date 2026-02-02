@@ -68,3 +68,35 @@ func (cubic *Cubic) Update(query db.Update) (sql.Result, error) {
 
 	return results, nil
 }
+
+func (cubic *Cubic) SafeDelete(query db.SafeDelete) (sql.Result, error) {
+	command, args, err := cubic.builder.SafeDelete(query)
+
+	if err != nil {
+		return nil, fmt.Errorf("cant generate sql query: %e", err)
+	}
+
+	results, err := cubic.connection.DB.Exec(command, args...)
+
+	if err != nil {
+		return nil, fmt.Errorf("error while executing the insert query \nerror: %e", err)
+	}
+
+	return results, nil
+}
+
+func (cubic *Cubic) HardDelete(query db.HardDelete) (sql.Result, error) {
+	command, args, err := cubic.builder.HardDelete(query)
+
+	if err != nil {
+		return nil, fmt.Errorf("cant generate sql query: %e", err)
+	}
+
+	results, err := cubic.connection.DB.Exec(command, args...)
+
+	if err != nil {
+		return nil, fmt.Errorf("error while executing the delete query \nerror: %e", err)
+	}
+
+	return results, nil
+}
